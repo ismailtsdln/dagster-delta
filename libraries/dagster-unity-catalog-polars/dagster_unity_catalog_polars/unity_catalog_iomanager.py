@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from typing import Union
 
 import polars as pl
 from dagster import (
@@ -10,6 +11,8 @@ from dagster import (
 from pydantic import ConfigDict
 
 from .utils import read_uc_table
+
+PolarsTypes = Union[pl.DataFrame, pl.LazyFrame]  # noqa: UP007
 
 
 class DatabricksUnityCatalogInputManager(ConfigurableIOManager):
@@ -64,7 +67,7 @@ class DatabricksUnityCatalogInputManager(ConfigurableIOManager):
     def load_input(
         self,
         context: InputContext,
-    ) -> pl.DataFrame:
+    ) -> PolarsTypes:
         """Read data through a sql warehouse and return it as a polars dataframe"""
         if context.upstream_output is not None:
             upstream_metadata = context.upstream_output.metadata or {}
@@ -80,8 +83,8 @@ class DatabricksUnityCatalogInputManager(ConfigurableIOManager):
         predicate = metadata.get("predicate")
         partition_predicate = None
         if context.has_asset_partitions:
-            partitions = context._asset_partitions_subset.subset  # type: ignore
-            if len(partitions) > 1:
+            partitions = context._asset_partitions_subset.get_partition_keys()  # type: ignore
+            if len(partitions) > 1:  # type: ignore
                 partition_predicate = f"{metadata['partition_expr']} in {str(tuple(partitions))}"
             else:
                 partition_predicate = f'{metadata["partition_expr"]} == "{list(partitions)[0]}"'
@@ -94,7 +97,12 @@ class DatabricksUnityCatalogInputManager(ConfigurableIOManager):
 
         query = self.form_query(catalog, schema, table, columns, predicate, partition_predicate)
 
-        return read_uc_table(query, self.token_generator, self.server_hostname, self.endpoint)
+        df = read_uc_table(query, self.token_generator, self.server_hostname, self.endpoint)
+
+        if context.dagster_type.typing_type == pl.LazyFrame:
+            return df.lazy()
+        else:
+            return df
 
     def handle_output(self) -> None:  # type: ignore
         """We're not doing anything here as we only want to read data."""

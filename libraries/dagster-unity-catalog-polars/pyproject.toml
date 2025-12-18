@@ -1,20 +1,20 @@
 [project]
 name = "dagster-unity-catalog-polars"
-version = "0.2.1"
+version = "0.2.2"
 description = "Polars Unity Catalog IO Managers for Dagster"
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
-    "dagster",
+    "dagster>=1.11",
     "databricks-sdk>=0.40.0",
-    "databricks-sql-connector>=3.7.0",
-    "polars",
+    "databricks-sql-connector>=4.0.0",
+    "polars>=1.30",
     "pydantic>=2.9.2",
 ]
 authors = [
-    {name = "Gian Violi", email = "96206151+gfvioli@users.noreply.github.com"},
-    {name = "Ion Koutsouris", email = "15728914+ion-elgreco@users.noreply.github.com"},
-    {name = "Stefan Verbruggen", email = "27513235+sverbruggen@users.noreply.github.com"}
+    { name = "Gian Violi", email = "96206151+gfvioli@users.noreply.github.com" },
+    { name = "Ion Koutsouris", email = "15728914+ion-elgreco@users.noreply.github.com" },
+    { name = "Stefan Verbruggen", email = "27513235+sverbruggen@users.noreply.github.com" },
 ]
 license = { file = "LICENSE" }
 classifiers = [
@@ -22,7 +22,7 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12"
+    "Programming Language :: Python :: 3.12",
 ]
 keywords = ["dagster", "polars", "io manager", "databricks", "unity catalog"]
 
@@ -33,7 +33,7 @@ build-backend = "hatchling.build"
 [tool.pyright]
 
 typeCheckingMode = 'basic'
-reportUnknownMemberType   = false
+reportUnknownMemberType = false
 exclude = [
     ".bzr",
     ".direnv",
@@ -57,7 +57,7 @@ exclude = [
     "node_modules",
 ]
 reportMissingImports = false
-pythonVersion =  "3.9"
+pythonVersion = "3.9"
 
 [tool.ruff]
 force-exclude = true
